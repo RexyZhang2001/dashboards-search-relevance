@@ -104,7 +104,7 @@ const SearchRelevancePage = ({
     location
   );
 
-  const isDataSourceUnsupported = useDataSourceSupportsSearchRelevance(
+  const supportsSearchRelevance = useDataSourceSupportsSearchRelevance(
     dataSourceEnabled,
     dataSourceId,
     savedObjects
@@ -215,7 +215,7 @@ const SearchRelevancePage = ({
         data-test-subj="searchRelevanceSelectDataSourcePrompt"
       />
     );
-  } else if (isDataSourceUnsupported) {
+  } else if (!supportsSearchRelevance) {
     dataSourceGate = (
       <EuiEmptyPrompt
         iconType="alert"

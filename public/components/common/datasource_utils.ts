@@ -116,28 +116,30 @@ export const useDataSourceSupportsSearchRelevance = (
   dataSourceId: string | undefined,
   savedObjects: CoreStart['savedObjects']
 ): boolean => {
-  const [isUnsupported, setIsUnsupported] = useState(false);
+  const [supportsSearchRelevance, setSupportsSearchRelevance] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
 
     if (!dataSourceEnabled || dataSourceId === undefined || dataSourceId === '') {
-      setIsUnsupported(false);
+      setSupportsSearchRelevance(true);
       return;
     }
+
+    setSupportsSearchRelevance(true);
 
     savedObjects.client
       .get<DataSourceAttributes>('data-source', dataSourceId)
       .then((dataSource) => {
         if (cancelled) return;
         const installedPlugins = dataSource?.attributes?.installedPlugins;
-        setIsUnsupported(
-          Array.isArray(installedPlugins) &&
-            !installedPlugins.includes(SEARCH_RELEVANCE_DATA_SOURCE_PLUGIN)
+        setSupportsSearchRelevance(
+          !Array.isArray(installedPlugins) ||
+            installedPlugins.includes(SEARCH_RELEVANCE_DATA_SOURCE_PLUGIN)
         );
       })
       .catch(() => {
-        if (!cancelled) setIsUnsupported(false);
+        if (!cancelled) setSupportsSearchRelevance(true);
       });
 
     return () => {
@@ -145,5 +147,5 @@ export const useDataSourceSupportsSearchRelevance = (
     };
   }, [dataSourceEnabled, dataSourceId, savedObjects]);
 
-  return isUnsupported;
+  return supportsSearchRelevance;
 };
